@@ -5,10 +5,13 @@ import "../../styles/home.css";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-  useEffect(()=>{ 
-	if(store.token && store.token != "" && store.token !=undefined) 
-	actions.getMessage()},
-  [store.token])
+    const token = store.token
+	console.log(token)
+	
+	useEffect(()=>{ 
+	if(store.token && store.token != "" && store.token !=undefined) {actions.getMessage()}
+},[token])
+
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Rigo!!</h1>

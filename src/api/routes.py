@@ -21,20 +21,44 @@ def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
     
-    if email != "test" or password != "test":
-        return jsonify({"msg": "Bad username or password"}), 401,
-    else :
-      access_token = create_access_token(identity=email)
-      return jsonify(access_token=access_token)
+    if not email or not password : 
+       return jsonify({"msg": "email y password son requeridos"}) 
+    user = User.query.filter_by(email = email, password=password).first()
+    if not user : return jsonify({"msg": "email y password son incorrectos"})
+    
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
 
+@api.route('/create/user', methods=['POST'])
+def create_user():
+    body = request.get_json()
 
+    # Verificar si el correo electrónico ya está en uso
+    if User.query.filter_by(email=body['email']).first():
+        return jsonify({'message': 'El correo electrónico ya está en uso'}), 400
 
+    # Crear un nuevo usuario
+    new_user = User(
+        email=body['email'],
+        password=body['password']  # Asegúrate de cifrar la contraseña antes de guardarla en la base de datos!
+    )
+    db.session.add(new_user)
+    
+    try:
+        db.session.commit()
+        return jsonify({'response': 'ok'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': f'Error al crear el usuario: {str(e)}'}), 400
+    
 
 @api.route("/hello", methods=["GET"])
 @jwt_required()
 def get_hello():
+
     dictionary = { 
-        "message" : "hello world"}
+        "message" : "hello world"
+        }
     return jsonify(dictionary)
 
 # es creado por esta la funcion create token

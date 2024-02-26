@@ -1,29 +1,23 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import "../../styles/home.css";
 
-export const Login = () => {
+export const SignUp = () => {
     const { store, actions } = useContext(Context);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    console.log("this is your token", store.token);
-
-    const handleClick = () => {
-        actions.login(email, password);
+    const handleSignUp = () => {
+        actions.SignUp(email, password); 
+        navigate("/login")// Llama a la función SignUp del contexto y pasa el email y la contraseña
     };
 
-    useEffect(() => {
-        if (store.token && store.token !== "" && store.token !== undefined) {
-            navigate("/");
-        }
-    }, [store.token, navigate]);
 
     return (
         <div className="text-center mt-5">
-            <h1>Log in</h1>
+            <h1>Sign up</h1>
             {store.token && store.token !== "" && store.token !== undefined ? (
                 "You are logged in with this token" + store.token
             ) : (
@@ -34,11 +28,9 @@ export const Login = () => {
                         placeholder="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                    /> <br></br><br></br>
-                    <button onClick={handleClick}>
-                        Login
-                    </button>
-                    <button onClick={ ()=>{navigate("/signup")}}>
+                    />
+                    {/* Llama a handleSignUp cuando se hace clic en el botón */}
+                    <button onClick={handleSignUp}>
                         Sign Up
                     </button>
                 </div>
