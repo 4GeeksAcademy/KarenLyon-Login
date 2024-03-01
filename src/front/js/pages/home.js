@@ -4,13 +4,6 @@ import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
-	const { store, actions } = useContext(Context);
-    const token = store.token
-	console.log(token)
-	
-	useEffect(()=>{ 
-	if(store.token && store.token != "" && store.token !=undefined) {actions.getMessage()}
-},[token])
 
 	return (
 		<div className="text-center mt-5">
@@ -19,7 +12,7 @@ export const Home = () => {
 				<img src={rigoImageUrl} />
 			</p>
 			<div className="alert alert-info">
-				{store.message}
+				<p> Welcome </p>
 			</div>
 			<p>
 				This boilerplate comes with lots of documentation:{" "}

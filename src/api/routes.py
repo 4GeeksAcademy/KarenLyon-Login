@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+import re
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
@@ -22,42 +23,47 @@ def create_token():
     password = request.json.get("password", None)
     
     if not email or not password : 
-       return jsonify({"msg": "email y password son requeridos"}) 
+       return jsonify({"msg": "The email and password are required"}) 
     user = User.query.filter_by(email = email, password=password).first()
-    if not user : return jsonify({"msg": "email y password son incorrectos"})
+    if not user : return jsonify({"msg": "The email and password are incorrect"})
     
-    access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    access_token = create_access_token(identity= email)
+    return jsonify({"access_token": access_token, "user_id": user.id })
+
 
 @api.route('/create/user', methods=['POST'])
 def create_user():
     body = request.get_json()
-
-    # Verificar si el correo electrónico ya está en uso
-    if User.query.filter_by(email=body['email']).first():
-        return jsonify({'message': 'El correo electrónico ya está en uso'}), 400
-
-    # Crear un nuevo usuario
+    
     new_user = User(
         email=body['email'],
-        password=body['password']  # Asegúrate de cifrar la contraseña antes de guardarla en la base de datos!
+        password=body['password']  
     )
-    db.session.add(new_user)
     
+    if User.query.filter_by(email=body['email']).first():
+        return jsonify({'msg': 'The email is already in use'}), 400
+    db.session.add(new_user)
+
     try:
         db.session.commit()
-        return jsonify({'response': 'ok'}), 200
+        return jsonify({'msg': "User created successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'message': f'Error al crear el usuario: {str(e)}'}), 400
+        return jsonify({'msg': f'Error al crear el usuario: {str(e)}'}), 500  # Cambiar el código de estado a 500 para indicar un error en el servidor
+
+def is_valid_email(email):
+       pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+       return re.match(pattern, email) is not None
+
+
     
 
-@api.route("/hello", methods=["GET"])
+@api.route("/private", methods=["GET"])
 @jwt_required()
-def get_hello():
+def get_private():
 
     dictionary = { 
-        "message" : "hello world"
+        "message" : "Now you can see everything"
         }
     return jsonify(dictionary)
 

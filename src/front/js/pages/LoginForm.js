@@ -8,18 +8,19 @@ export const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-
-    console.log("this is your token", store.token);
+    const [alertMessage, setAlertMessage] = useState();
 
     const handleClick = () => {
-        actions.login(email, password);
+        actions.login(email, password,setAlertMessage, navigate);
     };
 
     useEffect(() => {
         if (store.token && store.token !== "" && store.token !== undefined) {
-            navigate("/");
+            navigate("/private");
         }
     }, [store.token, navigate]);
+
+console.log(alertMessage)
 
     return (
         <div className="text-center mt-5">
@@ -38,9 +39,7 @@ export const Login = () => {
                     <button onClick={handleClick}>
                         Login
                     </button>
-                    <button onClick={ ()=>{navigate("/signup")}}>
-                        Sign Up
-                    </button>
+                    {alertMessage}
                 </div>
             )}
         </div>

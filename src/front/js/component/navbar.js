@@ -1,9 +1,13 @@
 import React, {useContext} from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
+
 	const { store, actions } = useContext(Context);
+	const navigate = useNavigate()
+
 	return (
 
 		<nav className="navbar navbar-light bg-light">
@@ -20,6 +24,7 @@ export const Navbar = () => {
 						<button onClick={()=> actions.logout()}className="btn btn-primary">log out</button>
 					</Link>
 					}
+					<button onClick={()=> navigate("/SignUp")}className="btn btn-primary">Sign up</button>
 				</div>
 			</div>
 		</nav>
