@@ -31,17 +31,27 @@ def create_token():
     return jsonify({"access_token": access_token, "user_id": user.id })
 
 
+
+
 @api.route('/create/user', methods=['POST'])
 def create_user():
     body = request.get_json()
-    
+    email = body.get('email', '').strip()
+    password = body.get('password', '').strip()
+
+    # Validación del formato del correo electrónico
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email):
+        return jsonify({'msg': 'Please enter a valid email address'}), 400
+
     new_user = User(
-        email=body['email'],
-        password=body['password']  
+        email=email,
+        password=password  
     )
     
-    if User.query.filter_by(email=body['email']).first():
+    if User.query.filter_by(email=email).first():
         return jsonify({'msg': 'The email is already in use'}), 400
+
     db.session.add(new_user)
 
     try:
@@ -49,12 +59,7 @@ def create_user():
         return jsonify({'msg': "User created successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        return jsonify({'msg': f'Error al crear el usuario: {str(e)}'}), 500  # Cambiar el código de estado a 500 para indicar un error en el servidor
-
-def is_valid_email(email):
-       pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-       return re.match(pattern, email) is not None
-
+        return jsonify({'msg': f'Error creating user: {str(e)}'}), 500
 
     
 
@@ -67,5 +72,4 @@ def get_private():
         }
     return jsonify(dictionary)
 
-# es creado por esta la funcion create token
 

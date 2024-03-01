@@ -65,6 +65,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// En tu flux
 			SignUp: async (email, password, setAlertMessage, setEmail, setPassword) => {
 				try {
+					
 					const options = {
 						method: "POST",
 						headers: {
@@ -75,18 +76,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 							password: password
 						})
 					};
+			
 					const response = await fetch("https://probable-goldfish-5gqp59qp465r2v64-3001.app.github.dev/api/create/user", options);
 					const data = await response.json();
-					const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-					if (data.msg === "The email is already in use") {
+			
+					if (data.msg ==='Please enter a valid email address'){
+						setAlertMessage(
+							<div className="alert alert-warning">
+								Please enter a valid email address
+							</div>
+						);
+					}
+					else if (data.msg === "The email is already in use") {
 						setAlertMessage(
 							<div className="alert alert-warning">
 								The email is already in use
 							</div>
 						);
-					}
-					else if (data.msg === "User created successfully") {
+					} else if (data.msg === "User created successfully") {
 						setAlertMessage(
 							<div className="alert alert-success">
 								User created successfully
@@ -96,16 +103,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 						setEmail("");
 						setPassword("");
 					}
-					else if (!emailPattern.test(email)) {
-						setAlertMessage(
-							<div className="alert alert-warning">
-								Please enter a valid email address
-							</div>
-						)
-					}
-
 				} catch (error) {
-					throw error; 
+					throw error;
 				}
 			},
 			
